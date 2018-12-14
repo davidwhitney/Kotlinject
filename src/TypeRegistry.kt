@@ -5,8 +5,9 @@ class TypeRegistry {
     private var _autoDiscovery : AutoDiscoveryResolver = AutoDiscoveryResolver()
     private var _bindings = mutableMapOf<KClass<*>, KClass<*>>()
 
-    fun bind(iface: KClass<*>, impl: KClass<*>) {
+    fun bind(iface: KClass<*>, impl: KClass<*>) : TypeRegistry {
         _bindings[iface] = impl
+        return this
     }
 
     fun selectTypeFor(requestedType: KClass<*>): KClass<*> {

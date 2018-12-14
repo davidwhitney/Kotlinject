@@ -45,4 +45,15 @@ class ContainerTests {
 
         assertEquals("Foo2", instance::class.simpleName)
     }
+
+    @Test
+    fun resolve_chainBindingPresent_CanResolveToBoundImplementation(){
+        _container.registrations
+            .bind(IFoo::class, Foo2::class)
+            .bind(TypeWithDependency::class, TypeWithDependency::class)
+
+        var instance = _container.resolve(IFoo::class)
+
+        assertEquals("Foo2", instance::class.simpleName)
+    }
 }
