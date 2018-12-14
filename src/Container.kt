@@ -1,15 +1,14 @@
-import TypeResolution.TypeResolver
+import TypeResolution.AutoDiscoveryResolver
 import kotlin.reflect.KClass
 
 class Container {
 
-    private var _ctorSelector: ConstructorSelector = ConstructorSelector()
-    private var _typeResolver: TypeResolver = TypeResolver()
     val registrations = TypeRegistry()
+    private var _ctorSelector: ConstructorSelector = ConstructorSelector()
 
     fun resolve(requestedType: KClass<*>): Any {
 
-        var typeToCreate = _typeResolver.selectTypeFor(requestedType)
+        var typeToCreate = registrations.selectTypeFor(requestedType)
 
         val constructorToExecute = _ctorSelector.select(typeToCreate)
         val params = constructorToExecute.parameters.toList()
@@ -26,8 +25,20 @@ class Container {
 }
 
 class TypeRegistry {
-    fun bind(iface: KClass<*>, impl: KClass<*>) {
+    private var _autoDiscovery : AutoDiscoveryResolver = AutoDiscoveryResolver()
+    private var _bindings = mutableMapOf<KClass<*>, KClass<*>>()
 
+    fun bind(iface: KClass<*>, impl: KClass<*>) {
+        _bindings[iface] = impl
+    }
+
+    fun selectTypeFor(requestedType: KClass<*>): KClass<*> {
+
+        if(_bindings.containsKey(requestedType)){
+            return _bindings[requestedType]!!
+        }
+
+        return _autoDiscovery.selectTypeFor(requestedType)
     }
 }
 

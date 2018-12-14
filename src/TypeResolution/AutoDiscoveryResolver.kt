@@ -3,7 +3,7 @@ package TypeResolution
 import TypeResolution.InterfaceAutoDiscoveryStrategies.*
 import kotlin.reflect.*
 
-class TypeResolver {
+class AutoDiscoveryResolver {
 
     private var _strategies: List<InterfaceDiscoveryStrategy>
             = listOf<InterfaceDiscoveryStrategy>(
