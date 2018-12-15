@@ -15,7 +15,7 @@ class ContainerTests {
     private lateinit var _container: Container
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         _container = Container()
         _container.registrations.autoDiscovery = false
         _container.registrations.bind(IFoo::class, Foo::class)
