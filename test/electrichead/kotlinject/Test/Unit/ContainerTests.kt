@@ -1,13 +1,13 @@
 package electrichead.kotlinject.Test.Unit
 
+import electrichead.kotlinject.CircularDependencyException
 import electrichead.kotlinject.Container
+import electrichead.kotlinject.Test.Unit.stubs.*
 import electrichead.kotlinject.registration.Lifecycle
-import electrichead.kotlinject.Test.Unit.stubs.Bar
-import electrichead.kotlinject.Test.Unit.stubs.Foo
-import electrichead.kotlinject.Test.Unit.stubs.IBar
-import electrichead.kotlinject.Test.Unit.stubs.IFoo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.lang.Exception
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -36,11 +36,27 @@ class ContainerTests {
     }
 
     @Test
+    fun resolve_ResolvesTypesFromDelegates() {
+        val foo = Foo()
+        _container.registrations.bind(Foo::class, { foo })
+
+        val instance = _container.resolve(Foo::class)
+
+        assertEquals(foo, instance)
+    }
+
+    @Test
     fun resolve_TypeBoundAsSingleton_ResolvesSameInstanceTwice() {
         val instance1 = _container.resolve(IBar::class)
         val instance2 = _container.resolve(IBar::class)
-
         assertEquals(instance1, instance2)
+    }
+
+    @Test
+    fun resolve_TypeWithCircularDependency_Throws() {
+        _container.registrations.bind(TypeWithACircularDep::class)
+        _container.registrations.bind(TypeWithACircularDep2::class)
+        assertThrows<CircularDependencyException> { _container.resolve(TypeWithACircularDep::class) }
     }
 
 }

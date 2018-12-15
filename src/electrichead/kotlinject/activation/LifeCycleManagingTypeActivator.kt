@@ -4,23 +4,23 @@ import electrichead.kotlinject.registration.Binding
 import electrichead.kotlinject.registration.Lifecycle
 import kotlin.reflect.KClass
 
-class LifeCycleManagingTypeActivator(creator: ICreateTypes) : ICreateTypes {
+class LifeCycleManagingTypeActivator(creator: IActivateTypes) : IActivateTypes {
     private var _instanceCache = mutableMapOf<KClass<*>, Any>()
-    private var _creator : ICreateTypes = creator
+    private var _activator : IActivateTypes = creator
 
     override fun create(binding: Binding): Any {
-        val typeToCreate = binding.targetType!!
+        val requestedType = binding.sourceType!!
 
         if(binding.lifecycle == Lifecycle.Singleton){
-            if(_instanceCache.containsKey(typeToCreate)) {
-                return _instanceCache[typeToCreate]!!
+            if(_instanceCache.containsKey(requestedType)) {
+                return _instanceCache[requestedType]!!
             }
         }
 
-        var instance = _creator.create(binding)
+        var instance = _activator.create(binding)
 
         if(binding.lifecycle == Lifecycle.Singleton){
-            _instanceCache[typeToCreate] = instance
+            _instanceCache[requestedType] = instance
         }
 
         return instance
