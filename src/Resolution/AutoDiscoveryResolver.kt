@@ -1,6 +1,6 @@
-package TypeResolution
+package Resolution
 
-import TypeResolution.InterfaceAutoDiscoveryStrategies.*
+import Resolution.AutoDiscovery.*
 import kotlin.reflect.*
 
 class AutoDiscoveryResolver {

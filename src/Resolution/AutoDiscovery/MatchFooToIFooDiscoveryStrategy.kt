@@ -1,4 +1,4 @@
-package TypeResolution.InterfaceAutoDiscoveryStrategies
+package Resolution.AutoDiscovery
 
 import kotlin.reflect.KClass
 

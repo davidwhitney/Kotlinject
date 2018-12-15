@@ -1,6 +1,7 @@
 package test
 
 import Container
+import Registration.Lifecycle
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import test.Stubs.*
@@ -14,46 +15,30 @@ class ContainerTests {
     @BeforeEach
     fun setUp(){
         _container = Container()
+        _container.registrations.autoDiscovery = false
+        _container.registrations.bind(IFoo::class, Foo::class)
+        _container.registrations.bind(IBar::class, Bar::class, Lifecycle.Singleton)
     }
 
     @Test
-    fun resolve_NoBindings_CanResolveTypeWithNoDependencies() {
-        var instance = _container.resolve(Foo::class)
-
+    fun resolveT_ResolvesTypesFromRegistry() {
+        val instance = _container.resolve<IFoo>()
         assertNotNull(instance)
     }
 
     @Test
-    fun resolve_NoBindings_CanResolveTypeWithDependencies(){
-        var instance = _container.resolve(TypeWithDependency::class)
-
+    fun resolve_ResolvesTypesFromRegistry() {
+        val instance = _container.resolve(IFoo::class)
         assertNotNull(instance)
     }
 
     @Test
-    fun resolve_NoBindings_CanResolveInterfaceWithDefaultImplementation(){
-        var instance = _container.resolve(IFoo::class)
+    fun resolve_TypeBoundAsSingleton_ResolvesSameInstanceTwice() {
+        val instance1 = _container.resolve(IBar::class)
+        val instance2 = _container.resolve(IBar::class)
 
-        assertNotNull(instance)
+        assertEquals(instance1, instance2)
     }
 
-    @Test
-    fun resolve_bindingPresent_CanResolveToBoundImplementation(){
-        _container.registrations.bind(IFoo::class, Foo2::class)
-
-        var instance = _container.resolve(IFoo::class)
-
-        assertEquals("Foo2", instance::class.simpleName)
-    }
-
-    @Test
-    fun resolve_chainBindingPresent_CanResolveToBoundImplementation(){
-        _container.registrations
-            .bind(IFoo::class, Foo2::class)
-            .bind(TypeWithDependency::class, TypeWithDependency::class)
-
-        var instance = _container.resolve(IFoo::class)
-
-        assertEquals("Foo2", instance::class.simpleName)
-    }
 }
+

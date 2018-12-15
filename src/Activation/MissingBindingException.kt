@@ -1,5 +1,7 @@
+package Activation
+
 import java.lang.Exception
 
 class MissingBindingException : Exception {
-    constructor()
+    constructor(details : String) : super(details)
 }

@@ -6,3 +6,5 @@ class TypeWithDependency{
         _foo = foo
     }
 }
+
+
