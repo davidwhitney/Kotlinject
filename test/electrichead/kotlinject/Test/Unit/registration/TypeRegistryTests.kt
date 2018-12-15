@@ -57,7 +57,7 @@ class TypeRegistryTests{
 
         _registry.bind<IFoo>({ Foo() })
 
-        val instance = _registry.retrieveBindingFor(Foo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class)
         assertNotNull(instance.targetDelegate)
     }
 

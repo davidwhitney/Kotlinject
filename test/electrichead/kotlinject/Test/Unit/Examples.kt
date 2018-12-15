@@ -34,4 +34,18 @@ class Examples {
         assertNotNull(foo2)
     }
 
+    @Test
+    fun `Generic bindings`() {
+        val container = Container()
+        container.registrations
+                    .bind<IFoo, Foo>()
+                    .bind<Bar, Bar>()
+
+        val foo = container.resolve<Foo>()
+        val foo2 = container.resolve<Bar>()
+
+        assertNotNull(foo)
+        assertNotNull(foo2)
+    }
+
 }
