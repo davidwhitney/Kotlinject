@@ -1,6 +1,6 @@
 package test
 
-import Activation.ConstructorSelector
+import Kotlinject.Activation.ConstructorSelector
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import test.Stubs.Bar

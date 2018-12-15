@@ -1,7 +1,7 @@
 package test
 
-import Container
-import Registration.Lifecycle
+import Kotlinject.Container
+import Kotlinject.Registration.Lifecycle
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import test.Stubs.*

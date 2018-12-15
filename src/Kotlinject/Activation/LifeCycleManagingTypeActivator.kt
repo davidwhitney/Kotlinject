@@ -1,7 +1,7 @@
-package Activation
+package Kotlinject.Activation
 
-import Registration.Binding
-import Registration.Lifecycle
+import Kotlinject.Registration.Binding
+import Kotlinject.Registration.Lifecycle
 import kotlin.reflect.KClass
 
 class LifeCycleManagingTypeActivator(creator: ICreateTypes) : ICreateTypes {

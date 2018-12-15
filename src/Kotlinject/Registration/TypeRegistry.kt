@@ -1,7 +1,7 @@
-package Registration
+package Kotlinject.Registration
 
-import Activation.MissingBindingException
-import Resolution.AutoDiscoveryResolver
+import Kotlinject.Activation.MissingBindingException
+import Kotlinject.Resolution.AutoDiscoveryResolver
 import kotlin.reflect.KClass
 
 class TypeRegistry {

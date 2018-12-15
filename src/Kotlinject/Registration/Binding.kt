@@ -1,6 +1,5 @@
-package Registration
+package Kotlinject.Registration
 
-import Registration.Lifecycle
 import kotlin.reflect.KClass
 
 class Binding {

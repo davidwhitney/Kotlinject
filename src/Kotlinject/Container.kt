@@ -1,7 +1,9 @@
-import Activation.ICreateTypes
-import Activation.LifeCycleManagingTypeActivator
-import Activation.TypeActivator
-import Registration.TypeRegistry
+package Kotlinject
+
+import Kotlinject.Activation.ICreateTypes
+import Kotlinject.Activation.LifeCycleManagingTypeActivator
+import Kotlinject.Activation.TypeActivator
+import Kotlinject.Registration.TypeRegistry
 import kotlin.reflect.KClass
 
 class Container {
@@ -9,7 +11,7 @@ class Container {
     val registrations = TypeRegistry()
     private val creator : ICreateTypes
 
-    constructor(){
+    init {
         creator = LifeCycleManagingTypeActivator(TypeActivator())
     }
 

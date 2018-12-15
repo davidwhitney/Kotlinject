@@ -1,4 +1,4 @@
-package Registration
+package Kotlinject.Registration
 
 enum class Lifecycle {
     Singleton,

@@ -1,4 +1,4 @@
-package Activation
+package Kotlinject.Activation
 
 import java.lang.Exception
 

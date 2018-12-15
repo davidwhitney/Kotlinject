@@ -1,6 +1,6 @@
-package Resolution
+package Kotlinject.Resolution
 
-import Resolution.AutoDiscovery.*
+import Kotlinject.Resolution.AutoDiscovery.*
 import kotlin.reflect.*
 
 class AutoDiscoveryResolver {

@@ -2,8 +2,8 @@ package test
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import Registration.TypeRegistry
-import Activation.MissingBindingException
+import Kotlinject.Registration.TypeRegistry
+import Kotlinject.Activation.MissingBindingException
 import org.junit.jupiter.api.assertThrows
 import test.Stubs.Foo
 import test.Stubs.Foo2

@@ -1,4 +1,4 @@
-package Activation
+package Kotlinject.Activation
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

@@ -1,4 +1,4 @@
-package Resolution.AutoDiscovery
+package Kotlinject.Resolution.AutoDiscovery
 
 import kotlin.reflect.KClass
 
