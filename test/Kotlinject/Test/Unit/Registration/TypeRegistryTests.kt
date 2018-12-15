@@ -1,14 +1,14 @@
-package test
+package Kotlinject.Test.Unit.Registration
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import Kotlinject.Registration.TypeRegistry
 import Kotlinject.Activation.MissingBindingException
 import org.junit.jupiter.api.assertThrows
-import test.Stubs.Foo
-import test.Stubs.Foo2
-import test.Stubs.IFoo
-import test.Stubs.TypeWithDependency
+import Kotlinject.Test.Unit.Stubs.Foo
+import Kotlinject.Test.Unit.Stubs.Foo2
+import Kotlinject.Test.Unit.Stubs.IFoo
+import Kotlinject.Test.Unit.Stubs.TypeWithDependency
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 

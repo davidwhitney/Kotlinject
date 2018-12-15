@@ -1,11 +1,11 @@
-package test
+package Kotlinject.Test.Unit.Activation
 
 import Kotlinject.Activation.ConstructorSelector
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import test.Stubs.Bar
-import test.Stubs.TypeWithTwoConstructors
-import test.Stubs.TypeWithTwoEqualSizedConstructors
+import Kotlinject.Test.Unit.Stubs.Bar
+import Kotlinject.Test.Unit.Stubs.TypeWithTwoConstructors
+import Kotlinject.Test.Unit.Stubs.TypeWithTwoEqualSizedConstructors
 import kotlin.test.assertEquals
 
 class ConstructorSelectorTests {

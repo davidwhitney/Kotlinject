@@ -1,4 +1,4 @@
-package test.Stubs
+package Kotlinject.Test.Unit.Stubs
 
 class TypeWithTwoEqualSizedConstructors {
     private lateinit var _foo: Foo

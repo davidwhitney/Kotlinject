@@ -1,4 +1,4 @@
-package test.Stubs
+package Kotlinject.Test.Unit.Stubs
 
 class TypeWithTwoConstructors {
     private var _foo: Foo

@@ -1,10 +1,13 @@
-package test
+package Kotlinject.Test.Unit
 
 import Kotlinject.Container
 import Kotlinject.Registration.Lifecycle
+import Kotlinject.Test.Unit.Stubs.Bar
+import Kotlinject.Test.Unit.Stubs.Foo
+import Kotlinject.Test.Unit.Stubs.IBar
+import Kotlinject.Test.Unit.Stubs.IFoo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import test.Stubs.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
