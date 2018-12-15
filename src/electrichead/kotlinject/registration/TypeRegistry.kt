@@ -10,6 +10,11 @@ class TypeRegistry {
     private var _autoDiscovery = AutoDiscoveryResolver()
     private var _bindings = mutableMapOf<KClass<*>, Binding>()
 
+
+    inline fun <reified T1: Any, reified T2: Any> bind(lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
+        return bind(T1::class, T2::class, lifecycle)
+    }
+
     fun bind(iface: KClass<*>, impl: KClass<*>? = null, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
         var target = impl
 
@@ -19,6 +24,11 @@ class TypeRegistry {
 
         _bindings[iface] = Binding(iface, target!!, lifecycle)
         return this
+    }
+
+
+    inline fun <reified T1: Any> bind(noinline function: () -> Any, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
+        return bind(T1::class, function, lifecycle)
     }
 
     fun bind(type: KClass<*>, function: () -> Any, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {

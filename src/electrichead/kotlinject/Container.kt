@@ -15,7 +15,7 @@ class Container {
         creator = LifeCycleManagingTypeActivator(TypeActivator())
     }
 
-    inline fun <reified T: Any> resolve(): T? {
+    inline fun <reified T: Any> resolve(): T {
         return resolve(T::class) as T
     }
 

@@ -22,6 +22,16 @@ class TypeRegistryTests{
     }
 
     @Test
+    fun bindT_AllowsTypesToBeCreated() {
+        _registry.autoDiscovery = false
+
+        _registry.bind<IFoo,Foo>()
+
+        val instance = _registry.retrieveBindingFor(IFoo::class)
+        assertNotNull(instance.targetType)
+    }
+
+    @Test
     fun bind_NoAutoDiscovery_AllowsTypesToBeCreated() {
         _registry.autoDiscovery = false
 
@@ -39,6 +49,16 @@ class TypeRegistryTests{
 
         val instance = _registry.retrieveBindingFor(Foo::class)
         assertNotNull(instance.targetType)
+    }
+
+    @Test
+    fun bindTToFactoryFunction_AllowsTypesToBeCreated() {
+        _registry.autoDiscovery = false
+
+        _registry.bind<IFoo>({ Foo() })
+
+        val instance = _registry.retrieveBindingFor(Foo::class)
+        assertNotNull(instance.targetDelegate)
     }
 
     @Test

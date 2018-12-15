@@ -7,7 +7,6 @@ import electrichead.kotlinject.registration.Lifecycle
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.lang.Exception
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -58,6 +57,5 @@ class ContainerTests {
         _container.registrations.bind(TypeWithACircularDep2::class)
         assertThrows<CircularDependencyException> { _container.resolve(TypeWithACircularDep::class) }
     }
-
 }
 
