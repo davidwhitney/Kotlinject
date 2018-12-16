@@ -1,22 +1,19 @@
 package electrichead.kotlinject.resolution
 
-import electrichead.kotlinject.resolution.autodiscovery.IInterfaceDiscoveryStrategy
-import electrichead.kotlinject.resolution.autodiscovery.MatchFooToFooImplDiscoveryStrategy
-import electrichead.kotlinject.resolution.autodiscovery.MatchFooToIFooDiscoveryStrategy
+import electrichead.kotlinject.resolution.autoresolution.IAutoResolutionStrategy
+import electrichead.kotlinject.resolution.autoresolution.ResolveConcreteTypeToSelfStrategy
+import electrichead.kotlinject.resolution.autoresolution.ResolveFooToFooImplStrategy
+import electrichead.kotlinject.resolution.autoresolution.ResolveIFooToFooStrategy
 import kotlin.reflect.KClass
 
 class AutoDiscoveryResolver {
-
-    var strategies: MutableList<IInterfaceDiscoveryStrategy> = mutableListOf(
-        MatchFooToIFooDiscoveryStrategy(),
-        MatchFooToFooImplDiscoveryStrategy()
+    var strategies: MutableList<IAutoResolutionStrategy> = mutableListOf(
+        ResolveConcreteTypeToSelfStrategy(),
+        ResolveIFooToFooStrategy(),
+        ResolveFooToFooImplStrategy()
     )
 
     fun selectTypeFor(requestedType: KClass<*>): KClass<*> {
-        if (!requestedType.isAbstract) {
-            return requestedType
-        }
-
         for (stat in strategies) {
             var match = stat.discover(requestedType)
             if (match != null) {

@@ -1,19 +1,19 @@
-package electrichead.kotlinject.Test.Unit.resolution.autodiscovery
+package electrichead.kotlinject.Test.Unit.resolution.autoresolution
 
 import electrichead.kotlinject.Test.Unit.stubs.*
-import electrichead.kotlinject.resolution.autodiscovery.MatchFooToIFooDiscoveryStrategy
+import electrichead.kotlinject.resolution.autoresolution.ResolveIFooToFooStrategy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class MatchFooToIFooDiscoveryStrategyTests {
+class MatchFooToIFooStrategyTests {
 
-    private lateinit var _resolver: MatchFooToIFooDiscoveryStrategy
+    private lateinit var _resolver: ResolveIFooToFooStrategy
 
     @BeforeEach
     fun setUp() {
-        _resolver = MatchFooToIFooDiscoveryStrategy()
+        _resolver = ResolveIFooToFooStrategy()
     }
 
     @Test

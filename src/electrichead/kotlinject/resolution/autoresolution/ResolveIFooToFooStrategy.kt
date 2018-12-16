@@ -1,13 +1,15 @@
-package electrichead.kotlinject.resolution.autodiscovery
+package electrichead.kotlinject.resolution.autoresolution
 
 import kotlin.reflect.KClass
 
-class MatchFooToFooImplDiscoveryStrategy : IInterfaceDiscoveryStrategy {
+class ResolveIFooToFooStrategy : IAutoResolutionStrategy {
     override fun discover(requestedType: KClass<*>): KClass<*>? {
+        val simpleName = requestedType.simpleName
         val fqName = requestedType.qualifiedName
 
-        if (requestedType.isAbstract) {
-            val targetName = fqName + "Impl"
+        if(simpleName != null && simpleName.startsWith("I")){
+            val trimmed = simpleName.removeRange(0,1)
+            val targetName = fqName!!.replace(simpleName, trimmed)
 
             val instance = createInstance(targetName)
 
