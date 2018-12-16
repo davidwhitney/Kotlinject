@@ -1,14 +1,11 @@
 package electrichead.kotlinject.Test.Unit.registration
 
+import electrichead.kotlinject.Test.Unit.stubs.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import electrichead.kotlinject.registration.TypeRegistry
 import electrichead.kotlinject.activation.MissingBindingException
 import org.junit.jupiter.api.assertThrows
-import electrichead.kotlinject.Test.Unit.stubs.Foo
-import electrichead.kotlinject.Test.Unit.stubs.Foo2
-import electrichead.kotlinject.Test.Unit.stubs.IFoo
-import electrichead.kotlinject.Test.Unit.stubs.TypeWithDependency
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -119,5 +116,29 @@ class TypeRegistryTests{
         val instance = _registry.retrieveBindingFor(IFoo::class)
 
         assertEquals("Foo2", instance.targetType!!.simpleName)
+    }
+
+    @Test
+    fun scanFromPackageContaining_AutobindsInterfacesFromPackages() {
+        _registry.autoDiscovery = false
+
+        _registry
+            .scan
+            .fromPackageContaining<IFoo> { x -> x.bindAllInterfaces()}
+
+        val somethingElse = _registry.retrieveBindingFor(IBar::class)
+        assertNotNull(somethingElse.targetType)
+    }
+
+    @Test
+    fun scanFromPackageContaining_AutobindsClassesFromPackages() {
+        _registry.autoDiscovery = false
+
+        _registry
+            .scan
+            .fromPackageContaining<IFoo> { x -> x.bindClassesToSelf()}
+
+        val somethingElse = _registry.retrieveBindingFor(Bar::class)
+        assertNotNull(somethingElse.targetType)
     }
 }

@@ -1,12 +1,15 @@
 package electrichead.kotlinject.registration
 
 import electrichead.kotlinject.activation.MissingBindingException
+import electrichead.kotlinject.registration.packagescanning.AutoDiscovery
 import electrichead.kotlinject.resolution.AutoDiscoveryResolver
 import kotlin.reflect.KClass
 
 class TypeRegistry {
 
     var autoDiscovery : Boolean = true
+    val scan : AutoDiscovery = AutoDiscovery(this)
+
     private var _autoDiscovery = AutoDiscoveryResolver()
     private var _bindings = mutableMapOf<KClass<*>, Binding>()
 
