@@ -24,7 +24,7 @@ class TypeRegistryTests{
 
         _registry.bind<IFoo,Foo>()
 
-        val instance = _registry.retrieveBindingFor(IFoo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class).single()
         assertNotNull(instance.targetType)
     }
 
@@ -34,7 +34,7 @@ class TypeRegistryTests{
 
         _registry.bind(Foo::class, Foo::class)
 
-        val instance = _registry.retrieveBindingFor(Foo::class)
+        val instance = _registry.retrieveBindingFor(Foo::class).single()
         assertNotNull(instance.targetType)
     }
 
@@ -44,7 +44,7 @@ class TypeRegistryTests{
 
         _registry.bind(Foo::class)
 
-        val instance = _registry.retrieveBindingFor(Foo::class)
+        val instance = _registry.retrieveBindingFor(Foo::class).single()
         assertNotNull(instance.targetType)
     }
 
@@ -54,7 +54,7 @@ class TypeRegistryTests{
 
         _registry.bind<IFoo>({ Foo() })
 
-        val instance = _registry.retrieveBindingFor(IFoo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class).single()
         assertNotNull(instance.targetDelegate)
     }
 
@@ -64,7 +64,7 @@ class TypeRegistryTests{
 
         _registry.bind(Foo::class, { Foo() })
 
-        val instance = _registry.retrieveBindingFor(Foo::class)
+        val instance = _registry.retrieveBindingFor(Foo::class).single()
         assertNotNull(instance.targetDelegate)
     }
 
@@ -79,21 +79,21 @@ class TypeRegistryTests{
 
     @Test
     fun retrieveBindingFor_NoBindings_CanResolveTypeWithNoDependencies() {
-        val instance = _registry.retrieveBindingFor(Foo::class)
+        val instance = _registry.retrieveBindingFor(Foo::class).single()
 
         assertNotNull(instance.targetType)
     }
 
     @Test
     fun retrieveBindingFor_NoBindings_CanResolveTypeWithDependencies(){
-        val instance = _registry.retrieveBindingFor(TypeWithDependency::class)
+        val instance = _registry.retrieveBindingFor(TypeWithDependency::class).single()
 
         assertNotNull(instance.targetType)
     }
 
     @Test
     fun retrieveBindingFor_NoBindings_CanResolveInterfaceWithDefaultImplementation(){
-        val instance = _registry.retrieveBindingFor(IFoo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class).single()
 
         assertNotNull(instance.targetType)
     }
@@ -102,7 +102,7 @@ class TypeRegistryTests{
     fun retrieveBindingFor_bindingPresent_CanResolveToBoundImplementation(){
         _registry.bind(IFoo::class, Foo2::class)
 
-        val instance = _registry.retrieveBindingFor(IFoo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class).single()
 
         assertEquals("Foo2", instance.targetType!!.simpleName)
     }
@@ -113,32 +113,24 @@ class TypeRegistryTests{
             .bind(IFoo::class, Foo2::class)
             .bind(TypeWithDependency::class, TypeWithDependency::class)
 
-        val instance = _registry.retrieveBindingFor(IFoo::class)
+        val instance = _registry.retrieveBindingFor(IFoo::class).single()
 
         assertEquals("Foo2", instance.targetType!!.simpleName)
     }
 
     @Test
-    fun scanFromPackageContaining_AutobindsInterfacesFromPackages() {
-        _registry.autoDiscovery = false
-
+    fun retrieveBindingFor_SupportsConditionalBindings(){
         _registry
-            .scan
-            .fromPackageContaining<IFoo> { x -> x.bindAllInterfaces()}
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent1::class)
+            })
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
 
-        val somethingElse = _registry.retrieveBindingFor(IBar::class)
-        assertNotNull(somethingElse.targetType)
-    }
+        val bindings = _registry.retrieveBindingFor(IConditionalBindingStub::class)
 
-    @Test
-    fun scanFromPackageContaining_AutobindsClassesFromPackages() {
-        _registry.autoDiscovery = false
-
-        _registry
-            .scan
-            .fromPackageContaining<IFoo> { x -> x.bindClassesToSelf()}
-
-        val somethingElse = _registry.retrieveBindingFor(Bar::class)
-        assertNotNull(somethingElse.targetType)
+        assertEquals(2, bindings.count())
     }
 }
+

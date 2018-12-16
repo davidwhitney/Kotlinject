@@ -1,5 +1,6 @@
 package electrichead.kotlinject
 
+import electrichead.kotlinject.activation.ActivationContext
 import electrichead.kotlinject.activation.IActivateTypes
 import electrichead.kotlinject.activation.LifeCycleManagingTypeActivator
 import electrichead.kotlinject.activation.TypeActivator
@@ -12,7 +13,7 @@ class Container {
     private val creator : IActivateTypes
 
     init {
-        creator = LifeCycleManagingTypeActivator(TypeActivator())
+        creator = LifeCycleManagingTypeActivator(TypeActivator(registrations))
     }
 
     inline fun <reified T: Any> resolve(): T {
@@ -21,10 +22,11 @@ class Container {
 
     fun resolve(requestedType: KClass<*>): Any {
 
-        val binding = registrations.retrieveBindingFor(requestedType)
+        val bindings = registrations.retrieveBindingFor(requestedType)
+        val activationContext = ActivationContext(requestedType)
 
         try {
-            return creator.create(binding)
+            return creator.create(bindings, activationContext)
         } catch (ex : StackOverflowError){
             throw CircularDependencyException(ex)
         }

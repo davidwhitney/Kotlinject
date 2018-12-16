@@ -65,4 +65,15 @@ class Examples {
 
     private fun createFoo() = { Foo() }
 
+    @Test
+    fun `Scan for auto-registration`() {
+        val container = Container()
+        container.registrations.scan
+            .fromPackageContaining<IFoo> { x -> x.bindAllInterfaces()  }
+            .fromPackageContaining<IFoo> { x -> x.bindClassesToSelf()  }
+
+        val bar = container.resolve<Bar>()
+
+        assertNotNull(bar)
+    }
 }

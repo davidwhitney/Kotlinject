@@ -57,5 +57,25 @@ class ContainerTests {
         _container.registrations.bind(TypeWithACircularDep2::class)
         assertThrows<CircularDependencyException> { _container.resolve(TypeWithACircularDep::class) }
     }
+
+
+    @Test
+    fun resolve_SupportsConditionalBindings(){
+        _container.registrations
+            .bind<ConditionalBindingParent1, ConditionalBindingParent1>()
+            .bind<ConditionalBindingParent2, ConditionalBindingParent2>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent1::class)
+            })
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
+
+        val instance1 =  _container.resolve<ConditionalBindingParent1>()
+        val instance2 =  _container.resolve<ConditionalBindingParent2>()
+
+        assertEquals("ConditionalBindingImplementation1", instance1.injected::class.simpleName)
+        assertEquals("ConditionalBindingImplementation2", instance2.injected::class.simpleName)
+    }
 }
 

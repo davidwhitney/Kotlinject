@@ -1,30 +1,45 @@
 package electrichead.kotlinject.activation
 
 import electrichead.kotlinject.registration.Binding
-import electrichead.kotlinject.registration.Lifecycle
+import electrichead.kotlinject.registration.TypeRegistry
 import kotlin.reflect.KClass
 
-class TypeActivator : IActivateTypes {
+class TypeActivator(typeRegistry: TypeRegistry) : IActivateTypes {
+    private var _typeRegistry = typeRegistry
     private var _ctorSelector = ConstructorSelector()
 
-    override fun create(binding: Binding): Any {
+    override fun create(
+        bindings: List<Binding>,
+        activationContext: ActivationContext
+    ): Any {
+
+        val binding = bindings.first { x -> x.condition!!.matches(activationContext) }
+
         val factoryCreated = binding.targetDelegate()
-        if(factoryCreated != null){
+        if (factoryCreated != null) {
             return factoryCreated
         }
 
         val typeToCreate = binding.targetType!!
-        return createFromType(typeToCreate)
+        return createFromType(typeToCreate, activationContext)
     }
 
-    private fun createFromType(typeToCreate: KClass<*>): Any {
+    private fun createFromType(
+        typeToCreate: KClass<*>,
+        activationContext: ActivationContext
+    ): Any {
+
         val constructorToExecute = _ctorSelector.select(typeToCreate)
         val params = constructorToExecute.parameters.toList()
 
         val dependencies = mutableListOf<Any>()
         for (p in params) {
-            val typeToResolve = p.type.classifier as KClass<*>
-            val instance = create(Binding(typeToResolve, typeToResolve, Lifecycle.PerRequest))
+            val paramToCreate = p.type.classifier as KClass<*>
+            val bindings = _typeRegistry.retrieveBindingFor(paramToCreate)
+
+            activationContext.activationHistory.add(Pair(typeToCreate, paramToCreate))
+
+            val instance = create(bindings, activationContext)
             dependencies.add(instance)
         }
 

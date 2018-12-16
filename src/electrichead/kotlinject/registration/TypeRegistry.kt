@@ -1,54 +1,83 @@
 package electrichead.kotlinject.registration
 
 import electrichead.kotlinject.activation.MissingBindingException
+import electrichead.kotlinject.registration.conditionalbinding.AlwaysMatches
+import electrichead.kotlinject.registration.conditionalbinding.BindingConditions
+import electrichead.kotlinject.registration.conditionalbinding.IBindingCondition
 import electrichead.kotlinject.registration.packagescanning.AutoDiscovery
 import electrichead.kotlinject.resolution.AutoDiscoveryResolver
 import kotlin.reflect.KClass
 
 class TypeRegistry {
 
-    var autoDiscovery : Boolean = true
-    val scan : AutoDiscovery = AutoDiscovery(this)
+    var autoDiscovery: Boolean = true
+    val scan: AutoDiscovery = AutoDiscovery(this)
 
     private var _autoDiscovery = AutoDiscoveryResolver()
-    private var _bindings = mutableMapOf<KClass<*>, Binding>()
+    private var _bindings = mutableMapOf<KClass<*>, MutableList<Binding>>()
 
-    inline fun <reified T1: Any, reified T2: Any> bind(lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
-        return bind(T1::class, T2::class, lifecycle)
+    inline fun <reified T1 : Any, reified T2 : Any> bind(
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        return bind(T1::class, T2::class, lifecycle, condition)
     }
 
-    fun bind(iface: KClass<*>, impl: KClass<*>? = null, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
+    inline fun <reified T1 : Any> bind(
+        noinline function: () -> Any,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        return bind(T1::class, function, lifecycle, condition)
+    }
+
+    fun bind(
+        iface: KClass<*>,
+        impl: KClass<*>? = null,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
         var target = impl
 
-        if(target == null && !iface.isAbstract) {
+        if (target == null && !iface.isAbstract) {
             target = iface
         }
 
-        _bindings[iface] = Binding(iface, target!!, lifecycle)
+        if (!_bindings.containsKey(iface)) {
+            _bindings[iface] = mutableListOf()
+        }
+
+        val binding = Binding(iface, target!!, lifecycle, condition(BindingConditions()))
+        _bindings[iface]!!.add(binding)
         return this
     }
 
+    fun bind(
+        type: KClass<*>,
+        function: () -> Any,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { AlwaysMatches() }
+    ): TypeRegistry {
 
-    inline fun <reified T1: Any> bind(noinline function: () -> Any, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
-        return bind(T1::class, function, lifecycle)
-    }
+        if (!_bindings.containsKey(type)) {
+            _bindings[type] = mutableListOf()
+        }
 
-    fun bind(type: KClass<*>, function: () -> Any, lifecycle: Lifecycle = Lifecycle.PerRequest) : TypeRegistry {
-        _bindings[type] = Binding(type, function, lifecycle)
+        val binding = Binding(type, function, lifecycle, condition(BindingConditions()))
+        _bindings[type]!!.add(binding)
         return this
     }
 
-    fun retrieveBindingFor(requestedType: KClass<*>): Binding {
-        if(_bindings.containsKey(requestedType)){
+    fun retrieveBindingFor(requestedType: KClass<*>): List<Binding> {
+        if (_bindings.containsKey(requestedType)) {
             return _bindings[requestedType]!!
         }
 
-        if(autoDiscovery) {
+        if (autoDiscovery) {
             val type = _autoDiscovery.selectTypeFor(requestedType)
-            return Binding(requestedType, type, Lifecycle.PerRequest)
+            return listOf(Binding(requestedType, type, Lifecycle.PerRequest))
         }
 
         throw MissingBindingException("No bindings found for: " + requestedType.qualifiedName)
     }
 }
-
