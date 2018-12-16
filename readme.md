@@ -28,8 +28,6 @@ Good DI -
 
 This is Kotlinject - named with a hat-tip to Ninject - the most user friendly DI container in .NET.
 
-The this is for you.
-
 # Installation
 
 Clone this repository? Profit? (TBC)
