@@ -11,8 +11,12 @@ Kotlinject
 
 ---
 
-DI is good. IoC is good. A good IoC container helps you implement DI in your application, while staying out of your way.
+DI is good. IoC is good.
+
+A good IoC container helps you implement DI in your application, while staying out of your way.
+
 Good DI -
+
 * Uses constructor injection
 * Is non-invasive in your codebase
 * Supports convention over configuration
