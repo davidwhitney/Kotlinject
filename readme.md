@@ -197,8 +197,8 @@ Any and all of these features can be mixed and matched.
         val container = Container()
 
         container.registrations
-            .bind<ConditionalBindingParent1, ConditionalBindingParent1>()
-            .bind<ConditionalBindingParent2, ConditionalBindingParent2>()
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent1::class)
             })
