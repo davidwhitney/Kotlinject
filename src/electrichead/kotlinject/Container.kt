@@ -21,7 +21,6 @@ class Container {
     }
 
     fun resolve(requestedType: KClass<*>): Any {
-
         val bindings = registrations.retrieveBindingFor(requestedType)
         val activationContext = ActivationContext(requestedType)
 

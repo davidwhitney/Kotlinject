@@ -1,10 +1,8 @@
 package electrichead.kotlinject.Test.Unit.registration.conditionalbinding
 
-import electrichead.kotlinject.Test.Unit.stubs.Bar
 import electrichead.kotlinject.Test.Unit.stubs.Foo
 import electrichead.kotlinject.Test.Unit.stubs.TypeWithDependency
 import electrichead.kotlinject.activation.ActivationContext
-import electrichead.kotlinject.registration.conditionalbinding.AlwaysMatches
 import electrichead.kotlinject.registration.conditionalbinding.WhenInjectedInto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,3 +35,4 @@ class WhenInjectedIntoTests {
         assertFalse(result)
     }
 }
+

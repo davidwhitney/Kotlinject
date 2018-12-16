@@ -61,13 +61,30 @@ class ContainerTests {
     @Test
     fun resolve_SupportsConditionalBindingsBasedOnInjectionTarget(){
         _container.registrations
-            .bind<ConditionalBindingParent1, ConditionalBindingParent1>()
-            .bind<ConditionalBindingParent2, ConditionalBindingParent2>()
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent1::class)
             })
             .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
+
+        val instance1 =  _container.resolve<ConditionalBindingParent1>()
+        val instance2 =  _container.resolve<ConditionalBindingParent2>()
+
+        assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
+        assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
+    }
+
+    @Test
+    fun resolve_supportsOnlyWhenBindings(){
+        _container.registrations
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x -> x.onlyWhen { ctx -> ctx.rootType == ConditionalBindingParent2::class }
             })
 
         val instance1 =  _container.resolve<ConditionalBindingParent1>()
