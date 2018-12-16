@@ -74,8 +74,8 @@ class ContainerTests {
         val instance1 =  _container.resolve<ConditionalBindingParent1>()
         val instance2 =  _container.resolve<ConditionalBindingParent2>()
 
-        assertEquals("ConditionalBindingImplementation1", instance1.injected::class.simpleName)
-        assertEquals("ConditionalBindingImplementation2", instance2.injected::class.simpleName)
+        assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
+        assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
     }
 }
 
