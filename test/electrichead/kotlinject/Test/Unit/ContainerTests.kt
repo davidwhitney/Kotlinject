@@ -58,9 +58,8 @@ class ContainerTests {
         assertThrows<CircularDependencyException> { _container.resolve(TypeWithACircularDep::class) }
     }
 
-
     @Test
-    fun resolve_SupportsConditionalBindings(){
+    fun resolve_SupportsConditionalBindingsBasedOnInjectionTarget(){
         _container.registrations
             .bind<ConditionalBindingParent1, ConditionalBindingParent1>()
             .bind<ConditionalBindingParent2, ConditionalBindingParent2>()
