@@ -12,13 +12,10 @@ class TypeActivator(typeRegistry: TypeRegistry) : IActivateTypes {
         bindings: List<Binding>,
         activationContext: ActivationContext
     ): Any {
-
-        val binding = bindings.last { x -> x.condition!!.matches(activationContext) }
+        val binding = bindings.last { x -> x.condition.matches(activationContext) }
 
         val factoryCreated = binding.targetDelegate()
-        if (factoryCreated != null) {
-            return factoryCreated
-        }
+        if (factoryCreated != null) return factoryCreated
 
         val typeToCreate = binding.targetType!!
         return createFromType(typeToCreate, activationContext)
@@ -28,7 +25,6 @@ class TypeActivator(typeRegistry: TypeRegistry) : IActivateTypes {
         typeToCreate: KClass<*>,
         activationContext: ActivationContext
     ): Any {
-
         val constructorToExecute = _ctorSelector.select(typeToCreate)
         val params = constructorToExecute.parameters.toList()
 

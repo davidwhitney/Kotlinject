@@ -1,13 +1,13 @@
 package electrichead.kotlinject.resolution
 
-import electrichead.kotlinject.resolution.autodiscovery.InterfaceDiscoveryStrategy
+import electrichead.kotlinject.resolution.autodiscovery.IInterfaceDiscoveryStrategy
 import electrichead.kotlinject.resolution.autodiscovery.MatchFooToFooImplDiscoveryStrategy
 import electrichead.kotlinject.resolution.autodiscovery.MatchFooToIFooDiscoveryStrategy
 import kotlin.reflect.KClass
 
 class AutoDiscoveryResolver {
 
-    private var _strategies: List<InterfaceDiscoveryStrategy> = listOf(
+    var strategies: MutableList<IInterfaceDiscoveryStrategy> = mutableListOf(
         MatchFooToIFooDiscoveryStrategy(),
         MatchFooToFooImplDiscoveryStrategy()
     )
@@ -17,7 +17,7 @@ class AutoDiscoveryResolver {
             return requestedType
         }
 
-        for (stat in _strategies) {
+        for (stat in strategies) {
             var match = stat.discover(requestedType)
             if (match != null) {
                 return match

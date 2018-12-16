@@ -14,7 +14,7 @@ class LifeCycleManagingTypeActivator(creator: IActivateTypes) : IActivateTypes {
     ): Any {
 
         val binding = bindings.first()
-        val requestedType = binding.sourceType!!
+        val requestedType = binding.sourceType
 
         if(binding.lifecycle == Lifecycle.Singleton){
             if(_instanceCache.containsKey(requestedType)) {
@@ -22,7 +22,7 @@ class LifeCycleManagingTypeActivator(creator: IActivateTypes) : IActivateTypes {
             }
         }
 
-        var instance = _activator.create(bindings, activationContext)
+        val instance = _activator.create(bindings, activationContext)
 
         if(binding.lifecycle == Lifecycle.Singleton){
             _instanceCache[requestedType] = instance

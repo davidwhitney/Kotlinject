@@ -2,6 +2,6 @@ package electrichead.kotlinject.resolution.autodiscovery
 
 import kotlin.reflect.KClass
 
-interface InterfaceDiscoveryStrategy{
+interface IInterfaceDiscoveryStrategy{
     fun discover(requestedType: KClass<*>): KClass<*>?
 }

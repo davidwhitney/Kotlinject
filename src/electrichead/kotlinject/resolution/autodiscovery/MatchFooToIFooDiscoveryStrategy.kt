@@ -2,7 +2,7 @@ package electrichead.kotlinject.resolution.autodiscovery
 
 import kotlin.reflect.KClass
 
-class MatchFooToIFooDiscoveryStrategy : InterfaceDiscoveryStrategy {
+class MatchFooToIFooDiscoveryStrategy : IInterfaceDiscoveryStrategy {
     override fun discover(requestedType: KClass<*>): KClass<*>? {
         val simpleName = requestedType.simpleName
         val fqName = requestedType.qualifiedName

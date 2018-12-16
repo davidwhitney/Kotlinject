@@ -31,6 +31,13 @@ class TypeRegistry {
         return bind(T1::class, function, lifecycle, condition)
     }
 
+    inline fun <reified T1 : Any> bindSelf(
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        return bind(T1::class, T1::class, lifecycle, condition)
+    }
+
     fun bind(
         iface: KClass<*>,
         impl: KClass<*>? = null,

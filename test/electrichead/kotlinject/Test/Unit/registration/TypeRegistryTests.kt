@@ -39,6 +39,16 @@ class TypeRegistryTests{
     }
 
     @Test
+    fun bindSelfT_AllowsTypesToBeCreated() {
+        _registry.autoDiscovery = false
+
+        _registry.bindSelf<Foo>()
+
+        val instance = _registry.retrieveBindingFor(Foo::class).single()
+        assertNotNull(instance.targetType)
+    }
+
+    @Test
     fun bind_ToSelf_AllowsTypesToBeCreated() {
         _registry.autoDiscovery = false
 
