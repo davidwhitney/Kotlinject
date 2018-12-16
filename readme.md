@@ -218,7 +218,7 @@ Any and all of these features can be mixed and matched.
 
 * Singleton
 
-```kotline
+```kotlin
 
     @Test
     fun `Configure a singleton`(){
@@ -235,7 +235,7 @@ Any and all of these features can be mixed and matched.
 
 * Per-Request / Transient
 
-```kotline
+```kotlin
 
     @Test
     fun `Configure a singleton`(){
