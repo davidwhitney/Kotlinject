@@ -190,6 +190,8 @@ Any and all of these features can be mixed and matched.
 
 ## Contextual bindings
 
+### WhenInjectedInto - binding constraint
+
 ```kotlin
 
     @Test
@@ -204,6 +206,31 @@ Any and all of these features can be mixed and matched.
             })
             .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
+
+        val instance1 =  container.resolve<ConditionalBindingParent1>()
+        val instance2 =  container.resolve<ConditionalBindingParent2>()
+
+        assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
+        assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
+    }
+```
+
+### When freeform binding constraint
+
+We'll pass you the ActivationContext, and you can implement your binding condition in a lambda
+
+```kotlin
+    @Test
+    fun `Freeform contextual bindings using onlyWhen`(){
+        val container = Container()
+
+        container.registrations
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x -> x.onlyWhen { ctx -> ctx.rootType == ConditionalBindingParent2::class }
             })
 
         val instance1 =  container.resolve<ConditionalBindingParent1>()

@@ -98,6 +98,26 @@ class Examples {
     }
 
     @Test
+    fun `Freeform contextual bindings using onlyWhen`(){
+        val container = Container()
+
+        container.registrations
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x -> x.onlyWhen { ctx -> ctx.rootType == ConditionalBindingParent2::class }
+            })
+
+        val instance1 =  container.resolve<ConditionalBindingParent1>()
+        val instance2 =  container.resolve<ConditionalBindingParent2>()
+
+        assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
+        assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
+    }
+
+
+    @Test
     fun `Configure a singleton`(){
         val container = Container()
         container.registrations.bind(IBar::class, Bar::class, Lifecycle.Singleton)
