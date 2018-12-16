@@ -13,7 +13,7 @@ class TypeActivator(typeRegistry: TypeRegistry) : IActivateTypes {
         activationContext: ActivationContext
     ): Any {
 
-        val binding = bindings.first { x -> x.condition!!.matches(activationContext) }
+        val binding = bindings.last { x -> x.condition!!.matches(activationContext) }
 
         val factoryCreated = binding.targetDelegate()
         if (factoryCreated != null) {

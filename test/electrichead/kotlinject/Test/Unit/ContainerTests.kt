@@ -76,5 +76,16 @@ class ContainerTests {
         assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
         assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
     }
+
+    @Test
+    fun resolve_MultipleBindingsExistThatAllMatch_LastOneInWins(){
+        _container.registrations
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>()
+
+        val instance =  _container.resolve<IConditionalBindingStub>()
+
+        assertEquals(ConditionalBindingImplementation2::class, instance::class)
+    }
 }
 

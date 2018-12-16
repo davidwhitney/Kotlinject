@@ -1,11 +1,10 @@
 package electrichead.kotlinject.Test.Unit
 
 import electrichead.kotlinject.Container
-import electrichead.kotlinject.Test.Unit.stubs.Bar
-import electrichead.kotlinject.Test.Unit.stubs.Foo
-import electrichead.kotlinject.Test.Unit.stubs.IBar
-import electrichead.kotlinject.Test.Unit.stubs.IFoo
+import electrichead.kotlinject.Test.Unit.stubs.*
+import electrichead.kotlinject.registration.Lifecycle
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class Examples {
@@ -75,5 +74,63 @@ class Examples {
         val bar = container.resolve<Bar>()
 
         assertNotNull(bar)
+    }
+
+    @Test
+    fun `Contextual bindings`() {
+        val container = Container()
+
+        container.registrations
+            .bind<ConditionalBindingParent1, ConditionalBindingParent1>()
+            .bind<ConditionalBindingParent2, ConditionalBindingParent2>()
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent1::class)
+            })
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
+
+        val instance1 =  container.resolve<ConditionalBindingParent1>()
+        val instance2 =  container.resolve<ConditionalBindingParent2>()
+
+        assertEquals(ConditionalBindingImplementation1::class, instance1.injected::class)
+        assertEquals(ConditionalBindingImplementation2::class, instance2.injected::class)
+    }
+
+    @Test
+    fun `Configure a singleton`(){
+        val container = Container()
+        container.registrations.bind(IBar::class, Bar::class, Lifecycle.Singleton)
+
+        val instance1 = container.resolve(IBar::class)
+        val instance2 = container.resolve(IBar::class)
+
+        assertEquals(instance1, instance2)
+    }
+
+    @Test
+    fun `Recommended approach`(){
+        val container = Container()
+
+        // Scan for everything
+        container.registrations.scan
+            .fromPackageContaining<IFoo> { x -> x.bindAllInterfaces()  }
+            .fromPackageContaining<IFoo> { x -> x.bindClassesToSelf()  }
+
+        // Register factories for special cases
+        container.registrations
+            .bind<IFoo>(createFoo(), lifecycle = Lifecycle.Singleton)
+            .bind<IBar>({ Bar() })
+
+        // Override bindings when you need to switch out implementations
+        container.registrations
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent1::class)
+            })
+            .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
+                    x->x.whenInjectedInto(ConditionalBindingParent2::class)
+            })
+
+        val bar = container.resolve<Bar>()
     }
 }
