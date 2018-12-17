@@ -38,6 +38,14 @@ class TypeRegistry {
         return bind(T1::class, T1::class, lifecycle, condition)
     }
 
+    fun bindSelf(
+        self: KClass<*>,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        return bind(self, self, lifecycle, condition)
+    }
+
     fun bind(
         iface: KClass<*>,
         impl: KClass<*>? = null,
@@ -87,4 +95,83 @@ class TypeRegistry {
 
         throw MissingBindingException("No bindings found for: " + requestedType.qualifiedName)
     }
+
+    // For Java
+    fun bind(
+        iface: java.lang.Class<*>,
+        impl: java.lang.Class<*>? = null
+    ): TypeRegistry {
+        return bind(iface, impl, Lifecycle.PerRequest, condition = { AlwaysMatches() })
+    }
+
+    fun bind(
+        iface: java.lang.Class<*>,
+        impl: java.lang.Class<*>? = null,
+        lifecycle: Lifecycle = Lifecycle.PerRequest
+    ): TypeRegistry {
+        return bind(iface, impl, lifecycle, condition = { AlwaysMatches() })
+    }
+
+    fun bind(
+        iface: java.lang.Class<*>,
+        impl: java.lang.Class<*>? = null,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        val ifaceK = iface.kotlin
+        var implK = impl?.kotlin
+
+        if (impl == null && !iface.isInterface) {
+            implK = ifaceK
+        }
+
+        return bind(ifaceK, implK, lifecycle, condition)
+    }
+
+    fun bind(
+        type: java.lang.Class<*>,
+        function: () -> Any
+    ): TypeRegistry {
+        return bind(type.kotlin, function, Lifecycle.PerRequest, { AlwaysMatches() })
+    }
+
+    fun bind(
+        type: java.lang.Class<*>,
+        function: () -> Any,
+        lifecycle: Lifecycle = Lifecycle.PerRequest
+    ): TypeRegistry {
+        return bind(type.kotlin, function, lifecycle, { AlwaysMatches() })
+    }
+
+    fun bind(
+        type: java.lang.Class<*>,
+        function: () -> Any,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { AlwaysMatches() }
+    ): TypeRegistry {
+        return bind(type.kotlin, function, lifecycle, condition)
+    }
+
+    fun bindSelf(
+        self: java.lang.Class<*>
+    ): TypeRegistry {
+        return bindSelf(self, Lifecycle.PerRequest, condition = { c -> c.alwaysMatches() })
+    }
+
+    fun bindSelf(
+        self: java.lang.Class<*>,
+        lifecycle: Lifecycle = Lifecycle.PerRequest
+    ): TypeRegistry {
+        return bindSelf(self, lifecycle, condition = { c -> c.alwaysMatches() })
+    }
+
+    fun bindSelf(
+        self: java.lang.Class<*>,
+        lifecycle: Lifecycle = Lifecycle.PerRequest,
+        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() }
+    ): TypeRegistry {
+        return bind(self, self, lifecycle, condition)
+    }
+    // End Java friendly overloads
+
 }

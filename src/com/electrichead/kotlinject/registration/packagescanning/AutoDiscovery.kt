@@ -3,12 +3,22 @@ package com.electrichead.kotlinject.registration.packagescanning
 import com.electrichead.kotlinject.registration.TypeRegistry
 import java.io.File
 import java.util.*
+import kotlin.reflect.KClass
 
 class AutoDiscovery(typeRegistry: TypeRegistry) {
     val registry = typeRegistry
 
-    inline fun <reified T: Any> fromPackageContaining(bindChoice: (op: BindingOperations) -> IBindingStrategy) : AutoDiscovery {
-        val packageName = T::class.java.`package`.name
+    // Java
+    fun fromPackageContaining(iface: java.lang.Class<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
+        return fromPackageContaining(iface.kotlin, bindChoice)
+    }
+
+    inline fun <reified T: Any> fromPackageContaining(noinline bindChoice: (op: BindingOperations) -> IBindingStrategy) : AutoDiscovery {
+        return fromPackageContaining(T::class, bindChoice)
+    }
+
+    fun fromPackageContaining(t : KClass<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy) : AutoDiscovery {
+        val packageName = t.java.`package`.name
         val classes = getClasses(packageName)
         bindChoice(BindingOperations()).bind(registry, classes)
         return this

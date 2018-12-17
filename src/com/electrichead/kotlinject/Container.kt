@@ -30,5 +30,10 @@ class Container {
             throw CircularDependencyException(ex)
         }
     }
+
+    // For Java
+    fun resolve(requestedType: java.lang.Class<*>) : Any {
+        return resolve(requestedType.kotlin)
+    }
 }
 
