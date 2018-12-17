@@ -87,7 +87,8 @@ public class ExamplesJava {
         container.registrations()
                 .bind(ConditionalBindingParent1.class)
                 .bindSelf(ConditionalBindingParent2.class)
-                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class,
+                    x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent1.class)))
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
                     x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent2.class)));
 
@@ -104,6 +105,11 @@ public class ExamplesJava {
 
         container.registrations()
                 .bind(Far.class, Far.class, Lifecycle.Singleton);
+
+        var one = container.resolve(Far.class);
+        var two = container.resolve(Far.class);
+
+        assertEquals(one, two);
     }
 }
 

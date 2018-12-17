@@ -144,6 +144,14 @@ class TypeRegistry {
         return bind(ifaceK, implK, condition, lifecycle)
     }
 
+    fun bind(
+        type: java.lang.Class<*>,
+        function: () -> Any,
+        lifecycle: Lifecycle? = null
+    ): TypeRegistry {
+        return bind(type, function, null, lifecycle)
+    }
+
     @JvmOverloads
     fun bind(
         type: java.lang.Class<*>,
