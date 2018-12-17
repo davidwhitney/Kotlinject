@@ -1,3 +1,5 @@
 package com.electrichead.kotlinject.Test.Unit.javastubs;
 
-public interface IConditionalBindingStub{}
+public interface IConditionalBindingStub{
+
+}
