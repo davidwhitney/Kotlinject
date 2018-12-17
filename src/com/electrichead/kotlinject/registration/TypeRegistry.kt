@@ -18,7 +18,7 @@ class TypeRegistry {
     private var _bindings = mutableMapOf<KClass<*>, MutableList<Binding>>()
 
     inline fun <reified T1 : Any, reified T2 : Any> bind(
-        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        noinline condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
         ): TypeRegistry {
         return bind(T1::class, T2::class, condition, lifecycle)
@@ -26,14 +26,14 @@ class TypeRegistry {
 
     inline fun <reified T1 : Any> bind(
         noinline function: () -> Any,
-        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        noinline condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
         ): TypeRegistry {
         return bind(T1::class, function, condition, lifecycle)
     }
 
     inline fun <reified T1 : Any> bindSelf(
-        noinline condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        noinline condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
         ): TypeRegistry {
         return bind(T1::class, T1::class, condition, lifecycle)
@@ -42,7 +42,7 @@ class TypeRegistry {
     @JvmOverloads
     fun bindSelf(
         self: KClass<*>,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         return bind(self, self, condition, lifecycle)
@@ -52,7 +52,7 @@ class TypeRegistry {
     fun bind(
         iface: KClass<*>,
         impl: KClass<*>? = null,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         var target = impl
@@ -72,7 +72,10 @@ class TypeRegistry {
 
         if(target == null) target = iface
 
-        val binding = Binding(iface, target, ls, condition(BindingConditions()))
+        var cond = condition
+        if(condition == null) cond = { AlwaysMatches() }
+
+        val binding = Binding(iface, target, ls, cond!!(BindingConditions()))
         _bindings[iface]!!.add(binding)
         return this
     }
@@ -81,7 +84,7 @@ class TypeRegistry {
     fun bind(
         type: KClass<*>,
         function: () -> Any,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { AlwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
 
@@ -94,7 +97,10 @@ class TypeRegistry {
             ls = Lifecycle.PerRequest
         }
 
-        val binding = Binding(type, function, ls, condition(BindingConditions()))
+        var cond = condition
+        if(condition == null) cond = { AlwaysMatches() }
+
+        val binding = Binding(type, function, ls, cond!!.invoke(BindingConditions()))
         _bindings[type]!!.add(binding)
         return this
     }
@@ -113,11 +119,19 @@ class TypeRegistry {
     }
 
     // For Java
+    fun bind(
+        iface: java.lang.Class<*>,
+        impl: java.lang.Class<*>? = null,
+        lifecycle: Lifecycle? = null
+    ): TypeRegistry {
+        return bind(iface, impl, null, lifecycle)
+    }
+
     @JvmOverloads
     fun bind(
         iface: java.lang.Class<*>,
         impl: java.lang.Class<*>? = null,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         val ifaceK = iface.kotlin
@@ -134,7 +148,7 @@ class TypeRegistry {
     fun bind(
         type: java.lang.Class<*>,
         function: () -> Any,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { AlwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         return bind(type.kotlin, function, condition, lifecycle)
@@ -143,7 +157,7 @@ class TypeRegistry {
     @JvmOverloads
     fun bindSelf(
         self: java.lang.Class<*>,
-        condition: ((op: BindingConditions) -> IBindingCondition) = { c -> c.alwaysMatches() },
+        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         return bind(self, self, condition, lifecycle)

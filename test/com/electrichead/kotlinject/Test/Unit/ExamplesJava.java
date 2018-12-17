@@ -1,6 +1,7 @@
 package com.electrichead.kotlinject.Test.Unit;
 
 import com.electrichead.kotlinject.Test.Unit.javastubs.*;
+import com.electrichead.kotlinject.registration.Lifecycle;
 import org.junit.jupiter.api.*;
 import com.electrichead.kotlinject.Container;
 
@@ -73,10 +74,36 @@ public class ExamplesJava {
                     x -> x.whenInjectedInto(ConditionalBindingParent2.class));
 
         var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
-        var instance2 =  (ConditionalBindingParent2)container.resolve(ConditionalBindingParent2.class);
+        var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
 
         assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
         assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+    }
+
+    @Test
+    public void ContextualBindingsUsingOnlyWhen() {
+        var container = new Container();
+
+        container.registrations()
+                .bind(ConditionalBindingParent1.class)
+                .bindSelf(ConditionalBindingParent2.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
+                    x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent2.class)));
+
+        var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
+        var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
+
+        assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
+        assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+    }
+
+    @Test
+    public void BindASingleton(){
+        var container = new Container();
+
+        container.registrations()
+                .bind(Far.class, Far.class, Lifecycle.Singleton);
     }
 }
 
