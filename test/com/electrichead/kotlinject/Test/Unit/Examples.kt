@@ -121,7 +121,7 @@ class Examples {
     @Test
     fun `Configure a singleton`(){
         val container = Container()
-        container.registrations.bind(IBar::class, Bar::class, Lifecycle.Singleton)
+        container.registrations.bind(IBar::class, Bar::class, lifecycle = Lifecycle.Singleton)
 
         val instance1 = container.resolve(IBar::class)
         val instance2 = container.resolve(IBar::class)

@@ -8,6 +8,10 @@ class BindingConditions {
         return AlwaysMatches()
     }
 
+    fun whenInjectedInto(target: java.lang.Class<*>): IBindingCondition {
+        return whenInjectedInto(target.kotlin)
+    }
+
     fun whenInjectedInto(target: KClass<*>): IBindingCondition {
         return WhenInjectedInto(target)
     }

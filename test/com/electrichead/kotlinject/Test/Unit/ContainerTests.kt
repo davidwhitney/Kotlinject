@@ -20,7 +20,7 @@ class ContainerTests {
         _container = Container()
         _container.registrations.autoDiscovery = false
         _container.registrations.bind(IFoo::class, Foo::class)
-        _container.registrations.bind(IBar::class, Bar::class, Lifecycle.Singleton)
+        _container.registrations.bind(IBar::class, Bar::class, lifecycle = Lifecycle.Singleton)
     }
 
     @Test

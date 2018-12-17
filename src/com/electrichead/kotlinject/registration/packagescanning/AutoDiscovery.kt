@@ -6,7 +6,7 @@ import java.util.*
 import kotlin.reflect.KClass
 
 class AutoDiscovery(typeRegistry: TypeRegistry) {
-    val registry = typeRegistry
+    private val registry = typeRegistry
 
     // Java
     fun fromPackageContaining(iface: java.lang.Class<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
@@ -24,7 +24,7 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
         return this
     }
 
-    fun getClasses(packageName: String): Array<Class<*>> {
+    private fun getClasses(packageName: String): Array<Class<*>> {
         val classLoader = Thread.currentThread().contextClassLoader!!
         val path = packageName.replace('.', '/')
         val resources = classLoader.getResources(path)

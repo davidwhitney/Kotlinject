@@ -9,7 +9,9 @@ import kotlin.reflect.KClass
 
 class Container {
 
+    @get:JvmName("registrations")
     val registrations = TypeRegistry()
+
     private val creator : IActivateTypes
 
     init {
@@ -35,5 +37,6 @@ class Container {
     fun resolve(requestedType: java.lang.Class<*>) : Any {
         return resolve(requestedType.kotlin)
     }
+    // For Java
 }
 
