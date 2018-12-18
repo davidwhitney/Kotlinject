@@ -1,4 +1,4 @@
-package com.electrichead.kotlinject.Test.Unit.javastubs;
+package com.electrichead.kotlinject.test.unit.javastubs;
 
 public interface IFar{
 

@@ -1,6 +1,6 @@
-package com.electrichead.kotlinject.Test.Unit;
+package com.electrichead.kotlinject.test.unit;
 
-import com.electrichead.kotlinject.Test.Unit.javastubs.*;
+import com.electrichead.kotlinject.test.unit.javastubs.*;
 import com.electrichead.kotlinject.registration.Lifecycle;
 import org.junit.jupiter.api.*;
 import com.electrichead.kotlinject.Container;
