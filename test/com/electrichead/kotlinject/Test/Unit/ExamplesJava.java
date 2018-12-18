@@ -88,7 +88,7 @@ public class ExamplesJava {
                 .bind(ConditionalBindingParent1.class)
                 .bindSelf(ConditionalBindingParent2.class)
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class,
-                    x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent1.class)))
+                    x -> x.onlyWhen(y -> y.getRootType().getSimpleName().equals("ConditionalBindingParent1")))
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
                     x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent2.class)));
 
