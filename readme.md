@@ -149,7 +149,7 @@ or in Java
     }
 ```
 
-Let's break down all those features...
+Let's break down all those features - the syntax you see in these examples can largely be mixed and matched (i.e. you can use the resolve<T>() API with all the other binding syntax params).
 
 # Features
 
