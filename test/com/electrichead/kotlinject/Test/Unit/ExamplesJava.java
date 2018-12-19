@@ -2,6 +2,10 @@ package com.electrichead.kotlinject.test.unit;
 
 import com.electrichead.kotlinject.test.unit.javastubs.*;
 import com.electrichead.kotlinject.registration.Lifecycle;
+import com.electrichead.kotlinject.test.unit.stubs.Bar;
+import com.electrichead.kotlinject.test.unit.stubs.Foo;
+import com.electrichead.kotlinject.test.unit.stubs.IBar;
+import com.electrichead.kotlinject.test.unit.stubs.IFoo;
 import org.junit.jupiter.api.*;
 import com.electrichead.kotlinject.Container;
 
@@ -68,7 +72,7 @@ public class ExamplesJava {
 
         container.registrations()
                 .bind(ConditionalBindingParent1.class)
-                .bindSelf(ConditionalBindingParent2.class)
+                .bind(ConditionalBindingParent2.class)
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class)
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
                     x -> x.whenInjectedInto(ConditionalBindingParent2.class));
@@ -86,11 +90,11 @@ public class ExamplesJava {
 
         container.registrations()
                 .bind(ConditionalBindingParent1.class)
-                .bindSelf(ConditionalBindingParent2.class)
+                .bind(ConditionalBindingParent2.class)
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class,
                     x -> x.onlyWhen(y -> y.getRootType().getSimpleName().equals("ConditionalBindingParent1")))
                 .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
-                    x -> x.onlyWhen(y -> y.getRootType().equals(ConditionalBindingParent2.class)));
+                    x -> x.onlyWhen(y -> y.getRootType().getSimpleName().equals("ConditionalBindingParent2")));
 
         var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
         var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
@@ -110,6 +114,36 @@ public class ExamplesJava {
         var two = container.resolve(Far.class);
 
         assertEquals(one, two);
+    }
+
+    @Test
+    public void RecommendedApproach (){
+        var container = new Container();
+
+        // Scan for everything
+        container.registrations().scan()
+            .fromPackageContaining(IFoo.class, x -> x.bindAllInterfaces())
+            .fromPackageContaining(IFoo.class, x -> x.bindClassesToSelf());
+
+        // Register factories for special cases
+        container.registrations()
+            .bind(Foo.class, () -> createFoo(), Lifecycle.Singleton)
+            .bind(IBar.class, () -> new Bar());
+
+        // Override bindings when you need to switch out implementations
+        container.registrations()
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class,
+                        x -> x.whenInjectedInto(ConditionalBindingParent1.class))
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
+                        x -> x.whenInjectedInto(ConditionalBindingParent2.class));
+
+        var bar = container.resolve(Bar.class);
+
+        assertNotNull(bar);
+    }
+
+    private Foo createFoo() {
+        return new Foo();
     }
 }
 

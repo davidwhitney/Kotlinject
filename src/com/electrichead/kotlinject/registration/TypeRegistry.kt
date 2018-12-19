@@ -40,15 +40,6 @@ class TypeRegistry {
     }
 
     @JvmOverloads
-    fun bindSelf(
-        self: KClass<*>,
-        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
-        lifecycle: Lifecycle? = null
-    ): TypeRegistry {
-        return bind(self, self, condition, lifecycle)
-    }
-
-    @JvmOverloads
     fun bind(
         iface: KClass<*>,
         impl: KClass<*>? = null,
@@ -160,15 +151,6 @@ class TypeRegistry {
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
         return bind(type.kotlin, function, condition, lifecycle)
-    }
-
-    @JvmOverloads
-    fun bindSelf(
-        self: java.lang.Class<*>,
-        condition: ((op: BindingConditions) -> IBindingCondition)? = null,
-        lifecycle: Lifecycle? = null
-    ): TypeRegistry {
-        return bind(self, self, condition, lifecycle)
     }
     // End Java friendly overloads
 

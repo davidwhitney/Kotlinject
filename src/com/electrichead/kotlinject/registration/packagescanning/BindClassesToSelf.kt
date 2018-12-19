@@ -9,7 +9,7 @@ class BindClassesToSelf : IBindingStrategy {
             if(!clazz.isInterface) {
                 val allInterfaces = clazz.interfaces
                 for(iface in allInterfaces){
-                    typeRegistry.bindSelf(clazz.kotlin)
+                    typeRegistry.bind(clazz.kotlin)
                 }
             }
         }

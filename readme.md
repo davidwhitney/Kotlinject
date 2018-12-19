@@ -37,7 +37,6 @@ Clone this repository? Profit? (TBC)
 There's an Examples.kt file included with the most useful scenarios - but the simplest use-case looks like this
 
 ```kotlin
-
     @Test
     fun `Auto-binding to default interfaces`() {
         val container = Container()
@@ -47,6 +46,21 @@ There's an Examples.kt file included with the most useful scenarios - but the si
 
         assertNotNull(foo)
         assertNotNull(foo2)
+    }
+```
+
+or in ExamplesJava.java
+
+```java
+    @Test
+    public void AutobindingToDefaultInterfaces() {
+        var container = new Container();
+
+        var foo = container.resolve(Far.class);
+        var foo2 = container.resolve(IFar.class);
+
+        assertNotNull(foo);
+        assertNotNull(foo2);
     }
 ```
 
@@ -78,7 +92,6 @@ You can disable this fallback discovery by setting the flag
 This would look something like:
 
 ```kotlin
-
     @Test
     fun `Recommended approach`(){
         val container = Container()
@@ -106,6 +119,36 @@ This would look something like:
     }
 ```
 
+or in Java
+
+```java
+    @Test
+    public void RecommendedApproach (){
+        var container = new Container();
+
+        // Scan for everything
+        container.registrations().scan()
+            .fromPackageContaining(IFoo.class, x -> x.bindAllInterfaces())
+            .fromPackageContaining(IFoo.class, x -> x.bindClassesToSelf());
+
+        // Register factories for special cases
+        container.registrations()
+            .bind(Foo.class, () -> createFoo(), Lifecycle.Singleton)
+            .bind(IBar.class, () -> new Bar());
+
+        // Override bindings when you need to switch out implementations
+        container.registrations()
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class,
+                        x -> x.whenInjectedInto(ConditionalBindingParent1.class))
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
+                        x -> x.whenInjectedInto(ConditionalBindingParent2.class));
+
+        var bar = container.resolve(Bar.class);
+
+        assertNotNull(bar);
+    }
+```
+
 Let's break down all those features...
 
 # Features
@@ -114,9 +157,9 @@ Any and all of these features can be mixed and matched.
 
 ## Auto-Binding to default implementations
 
+Kotlin:
 
 ```kotlin
-
     @Test
     fun `Auto-binding to default interfaces`() {
         val container = Container()
@@ -129,8 +172,24 @@ Any and all of these features can be mixed and matched.
     }
 ```
 
+Java:
+
+```java
+    @Test
+    public void AutobindingToDefaultInterfaces() {
+        var container = new Container();
+
+        var foo = container.resolve(Far.class);
+        var foo2 = container.resolve(IFar.class);
+
+        assertNotNull(foo);
+        assertNotNull(foo2);
+    }
+```
+
 ## Explicit binding syntaxes
 
+Kotlin:
 
 ```kotlin
     @Test
@@ -148,11 +207,29 @@ Any and all of these features can be mixed and matched.
     }
 ```
 
+Java:
+
+```java
+    @Test
+    public void ExplicitBindings() {
+        var container = new Container();
+        container.registrations()
+                .bind(Far.class, Far.class)
+                .bind(Bas.class, Bas.class);
+
+        var foo = container.resolve(Far.class);
+        var foo2 = container.resolve(Bas.class);
+
+        assertNotNull(foo);
+        assertNotNull(foo2);
+    }
+```
+
 ## Delgating construction to factory functions / delegates
 
+Kotlin:
 
 ```kotlin
-
     @Test
     fun `Bindings to factory functions`() {
         val container = Container()
@@ -170,10 +247,30 @@ Any and all of these features can be mixed and matched.
     private fun createFoo() = { Foo() }
 ```
 
+Java:
+
+```java
+    @Test
+    public void BindingsToFactoryFunctions(){
+        var container = new Container();
+
+        container.registrations()
+                .bind(Far.class, () -> new Far())
+                .bind(Bas.class, () -> new Bas());
+
+        var foo = container.resolve(Far.class);
+        var foo2 = container.resolve(Bas.class);
+
+        assertNotNull(foo);
+        assertNotNull(foo2);
+    }
+```
+
 ## Package scanning and auto-registration
 
-```kotlin
+Kotlin: 
 
+```kotlin
     @Test
     fun `Scan for auto-registration`() {
         val container = Container()
@@ -188,9 +285,27 @@ Any and all of these features can be mixed and matched.
 
 ```
 
+Java:
+
+```java
+    @Test
+    public void ScanForAutoRegistrations() {
+        var container = new Container();
+        container.registrations().scan()
+            .fromPackageContaining(Far.class, x -> x.bindAllInterfaces())
+            .fromPackageContaining(Far.class, x -> x.bindClassesToSelf());
+
+        var bar = (Far)container.resolve(Far.class);
+
+        assertNotNull(bar);
+    }
+```
+
 ## Contextual bindings
 
 ### WhenInjectedInto - binding constraint
+
+Kotlin: 
 
 ```kotlin
 
@@ -199,8 +314,8 @@ Any and all of these features can be mixed and matched.
         val container = Container()
 
         container.registrations
-            .bindSelf<ConditionalBindingParent1>()
-            .bindSelf<ConditionalBindingParent2>()
+            .bind<ConditionalBindingParent1>()
+            .bind<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent1::class)
             })
@@ -216,9 +331,32 @@ Any and all of these features can be mixed and matched.
     }
 ```
 
+Java:
+```java
+    @Test
+    public void ContextualBindings() {
+        var container = new Container();
+
+        container.registrations()
+                .bind(ConditionalBindingParent1.class)
+                .bind(ConditionalBindingParent2.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation1.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
+                    x -> x.whenInjectedInto(ConditionalBindingParent2.class));
+
+        var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
+        var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
+
+        assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
+        assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+    }
+```
+
 ### When freeform binding constraint
 
 We'll pass you the ActivationContext, and you can implement your binding condition in a lambda
+
+Kotlin: 
 
 ```kotlin
     @Test
@@ -226,8 +364,8 @@ We'll pass you the ActivationContext, and you can implement your binding conditi
         val container = Container()
 
         container.registrations
-            .bindSelf<ConditionalBindingParent1>()
-            .bindSelf<ConditionalBindingParent2>()
+            .bind<ConditionalBindingParent1>()
+            .bind<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
                     x -> x.onlyWhen { ctx -> ctx.rootType == ConditionalBindingParent2::class }
@@ -241,12 +379,34 @@ We'll pass you the ActivationContext, and you can implement your binding conditi
     }
 ```
 
+Java:
+
+```java
+    @Test
+    public void ContextualBindingsUsingOnlyWhen() {
+        var container = new Container();
+
+        container.registrations()
+                .bind(ConditionalBindingParent1.class)
+                .bind(ConditionalBindingParent2.class)
+                .bind(IConditionalBindingStub.class, ConditionalBindingImplementation2.class,
+                    x -> x.onlyWhen(y -> y.getRootType().getSimpleName().equals("ConditionalBindingParent2")));
+
+        var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
+        var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
+
+        assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
+        assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+    }
+```
+
 ## Lifecycle management
 
 * Singleton
 
-```kotlin
+Kotlin: 
 
+```kotlin
     @Test
     fun `Configure a singleton`(){
         val container = Container()
@@ -256,14 +416,31 @@ We'll pass you the ActivationContext, and you can implement your binding conditi
         val instance2 = container.resolve(IBar::class)
         
         assertEquals(instance1, instance2)
+    }	
+```
+
+Java:
+
+```java
+    @Test
+    public void BindASingleton(){
+        var container = new Container();
+
+        container.registrations()
+                .bind(Far.class, Far.class, Lifecycle.Singleton);
+
+        var one = container.resolve(Far.class);
+        var two = container.resolve(Far.class);
+
+        assertEquals(one, two);
     }
-	
 ```
 
 * Per-Request / Transient
 
-```kotlin
+Kotlin: 
 
+```kotlin
     @Test
     fun `Configure a singleton`(){
         val container = Container()
@@ -273,8 +450,7 @@ We'll pass you the ActivationContext, and you can implement your binding conditi
         val instance2 = container.resolve(IBar::class)
         
         assertEquals(instance1, instance2)
-    }
-	
+    }	
 ```
 
 # Contributing
