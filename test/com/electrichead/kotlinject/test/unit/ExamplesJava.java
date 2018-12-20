@@ -1,11 +1,7 @@
 package com.electrichead.kotlinject.test.unit;
 
-import com.electrichead.kotlinject.test.unit.javastubs.*;
 import com.electrichead.kotlinject.registration.Lifecycle;
-import com.electrichead.kotlinject.test.unit.stubs.Bar;
-import com.electrichead.kotlinject.test.unit.stubs.Foo;
-import com.electrichead.kotlinject.test.unit.stubs.IBar;
-import com.electrichead.kotlinject.test.unit.stubs.IFoo;
+import com.electrichead.kotlinject.test.unit.stubs.*;
 import org.junit.jupiter.api.*;
 import com.electrichead.kotlinject.Container;
 
@@ -18,8 +14,8 @@ public class ExamplesJava {
     public void AutobindingToDefaultInterfaces() {
         var container = new Container();
 
-        var foo = container.resolve(Far.class);
-        var foo2 = container.resolve(IFar.class);
+        var foo = container.resolve(Foo.class);
+        var foo2 = container.resolve(IFoo.class);
 
         assertNotNull(foo);
         assertNotNull(foo2);
@@ -29,11 +25,11 @@ public class ExamplesJava {
     public void ExplicitBindings() {
         var container = new Container();
         container.registrations()
-                .bind(Far.class, Far.class)
-                .bind(Bas.class, Bas.class);
+                .bind(Foo.class, Foo.class)
+                .bind(Bar.class, Bar.class);
 
-        var foo = container.resolve(Far.class);
-        var foo2 = container.resolve(Bas.class);
+        var foo = container.resolve(Foo.class);
+        var foo2 = container.resolve(Bar.class);
 
         assertNotNull(foo);
         assertNotNull(foo2);
@@ -44,11 +40,11 @@ public class ExamplesJava {
         var container = new Container();
 
         container.registrations()
-                .bind(Far.class, () -> new Far())
-                .bind(Bas.class, () -> new Bas());
+                .bind(Foo.class, () -> new Foo())
+                .bind(Bar.class, () -> new Bar());
 
-        var foo = container.resolve(Far.class);
-        var foo2 = container.resolve(Bas.class);
+        var foo = container.resolve(Foo.class);
+        var foo2 = container.resolve(Bar.class);
 
         assertNotNull(foo);
         assertNotNull(foo2);
@@ -58,10 +54,10 @@ public class ExamplesJava {
     public void ScanForAutoRegistrations() {
         var container = new Container();
         container.registrations().scan()
-            .fromPackageContaining(Far.class, x -> x.bindAllInterfaces())
-            .fromPackageContaining(Far.class, x -> x.bindClassesToSelf());
+            .fromPackageContaining(Foo.class, x -> x.bindAllInterfaces())
+            .fromPackageContaining(Foo.class, x -> x.bindClassesToSelf());
 
-        var bar = (Far)container.resolve(Far.class);
+        var bar = (Foo)container.resolve(Foo.class);
 
         assertNotNull(bar);
     }
@@ -80,8 +76,8 @@ public class ExamplesJava {
         var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
         var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
 
-        assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
-        assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+        assertEquals(ConditionalBindingImplementation1.class, instance1.getInjected().getClass());
+        assertEquals(ConditionalBindingImplementation2.class, instance2.getInjected().getClass());
     }
 
     @Test
@@ -99,8 +95,8 @@ public class ExamplesJava {
         var instance1 = (ConditionalBindingParent1) container.resolve(ConditionalBindingParent1.class);
         var instance2 = (ConditionalBindingParent2) container.resolve(ConditionalBindingParent2.class);
 
-        assertEquals(ConditionalBindingImplementation1.class, instance1.getDep().getClass());
-        assertEquals(ConditionalBindingImplementation2.class, instance2.getDep().getClass());
+        assertEquals(ConditionalBindingImplementation1.class, instance1.getInjected().getClass());
+        assertEquals(ConditionalBindingImplementation2.class, instance2.getInjected().getClass());
     }
 
     @Test
@@ -108,10 +104,10 @@ public class ExamplesJava {
         var container = new Container();
 
         container.registrations()
-                .bind(Far.class, Far.class, Lifecycle.Singleton);
+                .bind(Foo.class, Foo.class, Lifecycle.Singleton);
 
-        var one = container.resolve(Far.class);
-        var two = container.resolve(Far.class);
+        var one = container.resolve(Foo.class);
+        var two = container.resolve(Foo.class);
 
         assertEquals(one, two);
     }

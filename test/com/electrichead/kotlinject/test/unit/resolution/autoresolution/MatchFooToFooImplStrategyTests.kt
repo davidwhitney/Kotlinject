@@ -1,7 +1,7 @@
 package com.electrichead.kotlinject.test.unit.resolution.autoresolution
 
 import com.electrichead.kotlinject.test.unit.stubs.*
-import com.electrichead.kotlinject.test.unit.stubs2.BarBar
+import com.electrichead.kotlinject.test.unit.stubs.BarBar
 import com.electrichead.kotlinject.resolution.autoresolution.ResolveFooToFooImplStrategy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
