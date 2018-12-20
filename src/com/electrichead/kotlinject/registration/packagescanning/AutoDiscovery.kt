@@ -9,15 +9,25 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
     private val registry = typeRegistry
 
     // Java
-    fun fromPackageContaining(iface: java.lang.Class<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
+    fun fromPackageContaining(
+        iface: java.lang.Class<*>,
+        bindChoice: (op: BindingOperations) -> IBindingStrategy
+    ): AutoDiscovery {
         return fromPackageContaining(iface.kotlin, bindChoice)
     }
 
-    inline fun <reified T: Any> fromPackageContaining(noinline bindChoice: (op: BindingOperations) -> IBindingStrategy) : AutoDiscovery {
+    inline fun <reified T : Any> fromPackageContaining(noinline bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
         return fromPackageContaining(T::class, bindChoice)
     }
 
-    fun fromPackageContaining(t : KClass<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy) : AutoDiscovery {
+    fun fromClasspathWhere(where: (op: Collection<Class<*>>) -> Boolean, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
+        val inspector = ClasspathInspector()
+        val classes = inspector.allKnownClasses(where).toTypedArray()
+        bindChoice(BindingOperations()).bind(registry, classes)
+        return this
+    }
+
+    fun fromPackageContaining(t: KClass<*>, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
         val packageName = t.java.`package`.name
         val classes = getClasses(packageName)
         bindChoice(BindingOperations()).bind(registry, classes)
@@ -57,4 +67,5 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
         return classes
     }
 }
+
 

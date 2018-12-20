@@ -38,7 +38,7 @@ class TypeRegistry {
         ): TypeRegistry {
         return bind(T1::class, T1::class, condition, lifecycle)
     }
-
+    
     @JvmOverloads
     fun bind(
         from: KClass<*>,

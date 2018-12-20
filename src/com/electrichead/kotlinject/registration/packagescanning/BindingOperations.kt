@@ -8,4 +8,8 @@ class BindingOperations {
     fun bindClassesToSelf() : IBindingStrategy {
         return BindClassesToSelf()
     }
+
+    fun bindClassesAndInterfaces() : IBindingStrategy {
+        return  BindClassesAndInterfaces()
+    }
 }
