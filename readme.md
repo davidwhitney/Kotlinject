@@ -314,8 +314,8 @@ Kotlin:
         val container = Container()
 
         container.registrations
-            .bind<ConditionalBindingParent1>()
-            .bind<ConditionalBindingParent2>()
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>(condition = {
                     x->x.whenInjectedInto(ConditionalBindingParent1::class)
             })
@@ -364,8 +364,8 @@ Kotlin:
         val container = Container()
 
         container.registrations
-            .bind<ConditionalBindingParent1>()
-            .bind<ConditionalBindingParent2>()
+            .bindSelf<ConditionalBindingParent1>()
+            .bindSelf<ConditionalBindingParent2>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation1>()
             .bind<IConditionalBindingStub, ConditionalBindingImplementation2>(condition = {
                     x -> x.onlyWhen { ctx -> ctx.rootType == ConditionalBindingParent2::class }
