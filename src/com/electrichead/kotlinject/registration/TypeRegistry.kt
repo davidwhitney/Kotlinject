@@ -15,7 +15,7 @@ class TypeRegistry {
     val scan: AutoDiscovery = AutoDiscovery(this)
 
     private var _autoDiscovery = AutoDiscoveryResolver()
-    private var _bindings = mutableMapOf<KClass<*>, MutableList<Binding>>()
+    private var _bindings = TypeBindings()
 
     inline fun <reified T1 : Any, reified T2 : Any> bind(
         noinline condition: ((op: BindingConditions) -> IBindingCondition)? = null,
@@ -41,33 +41,17 @@ class TypeRegistry {
 
     @JvmOverloads
     fun bind(
-        iface: KClass<*>,
-        impl: KClass<*>? = null,
+        from: KClass<*>,
+        to: KClass<*>? = null,
         condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
-        var target = impl
-        var ls = lifecycle
+        val target = to ?: from
+        val ls = lifecycle ?: Lifecycle.PerRequest
+        val cond = condition ?: { AlwaysMatches() }
 
-        if (!iface.isAbstract) {
-            target = iface
-        }
-
-        if (!_bindings.containsKey(iface)) {
-            _bindings[iface] = mutableListOf()
-        }
-
-        if (ls == null) {
-            ls = Lifecycle.PerRequest
-        }
-
-        if(target == null) target = iface
-
-        var cond = condition
-        if(condition == null) cond = { AlwaysMatches() }
-
-        val binding = Binding(iface, target, ls, cond!!(BindingConditions()))
-        _bindings[iface]!!.add(binding)
+        val binding = Binding(from, target, ls, cond(BindingConditions()))
+        _bindings.add(from, binding)
         return this
     }
 
@@ -78,27 +62,17 @@ class TypeRegistry {
         condition: ((op: BindingConditions) -> IBindingCondition)? = null,
         lifecycle: Lifecycle? = null
     ): TypeRegistry {
+        val ls = lifecycle ?: Lifecycle.PerRequest
+        val cond = condition ?: { AlwaysMatches() }
 
-        if (!_bindings.containsKey(type)) {
-            _bindings[type] = mutableListOf()
-        }
-
-        var ls = lifecycle
-        if (ls == null) {
-            ls = Lifecycle.PerRequest
-        }
-
-        var cond = condition
-        if(condition == null) cond = { AlwaysMatches() }
-
-        val binding = Binding(type, function, ls, cond!!.invoke(BindingConditions()))
-        _bindings[type]!!.add(binding)
+        val binding = Binding(type, function, ls, cond.invoke(BindingConditions()))
+        _bindings.add(type, binding)
         return this
     }
 
     fun retrieveBindingFor(requestedType: KClass<*>): List<Binding> {
-        if (_bindings.containsKey(requestedType)) {
-            return _bindings[requestedType]!!
+        if (_bindings.hasMappingFor(requestedType)) {
+            return _bindings.get(requestedType)
         }
 
         if (autoDiscovery) {
