@@ -2,13 +2,13 @@ package com.electrichead.kotlinject.registration.packagescanning
 
 import java.io.File
 import java.io.FilenameFilter
-import java.util.ArrayList
+import java.util.*
 import java.util.jar.JarFile
 import kotlin.reflect.KClass
 
 class ClasspathInspector {
-    fun allKnownClasses(where: (op: Collection<Class<*>>) -> Boolean): ArrayList<Class<*>> {
-        val classFiles = ArrayList<Class<*>>()
+    fun allKnownClasses(where: (op: Collection<KClass<*>>) -> Boolean): List<KClass<*>> {
+        val classFiles = mutableListOf<KClass<*>>()
         val classLocations = classLocationsForCurrentClasspath()
 
         for (file in classLocations) {
@@ -32,7 +32,7 @@ class ClasspathInspector {
         return urls
     }
 
-    private fun getClassesFromPath(path: File): Collection<Class<*>> {
+    private fun getClassesFromPath(path: File): Collection<KClass<*>> {
         return if (path.isDirectory) {
             getClassesFromDirectory(path)
         } else {
@@ -44,31 +44,18 @@ class ClasspathInspector {
         return fileName.substring(0, fileName.length - 6).replace("[/\\\\]".toRegex(), "\\.")
     }
 
-    private fun getClassesFromJarFile(path: File): List<Class<*>> {
-        val classes = ArrayList<Class<*>>()
+    private fun getClassesFromJarFile(path: File): List<KClass<*>> {
+        if (!path.canRead()) {
+            return emptyList()
+        }
 
-        try {
-            if (!path.canRead()) {
-                return classes
-            }
-
-            val jar = JarFile(path)
-            val en = jar.entries()
-            while (en.hasMoreElements()) {
-                val entry = en.nextElement()
-
-                when {
-                    entry.name.endsWith("class") -> {
-                        val className = fromFileToClassName(entry.name)
-                        val clazz = loadClass(className)
-                        when {
-                            clazz != null -> classes.add(clazz)
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to read classes from jar file: $path", e)
+        val classes = mutableListOf<KClass<*>>()
+        val jar = JarFile(path)
+        for (entry in jar.entries()) {
+            if (!entry.name.endsWith("class")) continue
+            val className = fromFileToClassName(entry.name)
+            val clazz = loadClass(className) ?: continue
+            classes.add(clazz.kotlin)
         }
 
         return classes
@@ -82,23 +69,22 @@ class ClasspathInspector {
         }
     }
 
-    private fun getClassesFromDirectory(path: File): List<Class<*>> {
-        val classes = ArrayList<Class<*>>()
+    private fun getClassesFromDirectory(path: File): List<KClass<*>> {
+        val classes = mutableListOf<KClass<*>>()
 
-        // get jar files from top-level directory
-        val jarFiles = listFiles(path, FilenameFilter { dir, name -> name.endsWith(".jar") }, false)
+        val jarFiles = listFiles(path, FilenameFilter { _, name -> name.endsWith(".jar") }, false)
         for (file in jarFiles) {
             classes.addAll(getClassesFromJarFile(file))
         }
 
-        val classFiles = listFiles(path, FilenameFilter { dir, name -> name.endsWith(".class") }, true)
+        val classFiles = listFiles(path, FilenameFilter { _, name -> name.endsWith(".class") }, true)
 
         val substringBeginIndex = path.absolutePath.length + 1
         for (classfile in classFiles) {
             var className = classfile.absolutePath.substring(substringBeginIndex)
             className = fromFileToClassName(className)
             try {
-                classes.add(Class.forName(className))
+                classes.add(Class.forName(className).kotlin)
             } catch (e: Throwable) {
             }
 
@@ -112,7 +98,7 @@ class ClasspathInspector {
         val entries = directory.listFiles()
 
         for (entry in entries!!) {
-            if (filter == null || filter!!.accept(directory, entry.name)) {
+            if (filter == null || filter.accept(directory, entry.name)) {
                 files.add(entry)
             }
 

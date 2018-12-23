@@ -39,7 +39,7 @@ class AutoDiscoveryTests {
     @Test
     fun scanFromClassPath_AutobindsClassesFromPackages() {
         _discovery.fromClasspathWhere(
-            { classes -> classes.contains(Bar::class.java) },
+            { classes -> classes.contains(Bar::class) },
             { c -> c.bindClassesAndInterfaces()})
 
         val somethingElse = _registry.retrieveBindingFor(Foo::class).single()

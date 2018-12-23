@@ -20,9 +20,9 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
         return fromPackageContaining(T::class, bindChoice)
     }
 
-    fun fromClasspathWhere(where: (op: Collection<Class<*>>) -> Boolean, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
+    fun fromClasspathWhere(where: (op: Collection<KClass<*>>) -> Boolean, bindChoice: (op: BindingOperations) -> IBindingStrategy): AutoDiscovery {
         val inspector = ClasspathInspector()
-        val classes = inspector.allKnownClasses(where).toTypedArray()
+        val classes = inspector.allKnownClasses(where)
         bindChoice(BindingOperations()).bind(registry, classes)
         return this
     }
@@ -34,7 +34,7 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
         return this
     }
 
-    private fun getClasses(packageName: String): Array<Class<*>> {
+    private fun getClasses(packageName: String): List<KClass<*>> {
         val classLoader = Thread.currentThread().contextClassLoader!!
         val path = packageName.replace('.', '/')
         val resources = classLoader.getResources(path)
@@ -43,15 +43,15 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
             val resource = resources.nextElement()
             dirs.add(File(resource.file))
         }
-        val classes = ArrayList<Class<*>>()
+        val classes = mutableListOf<KClass<*>>()
         for (directory in dirs) {
             classes.addAll(findClasses(directory, packageName))
         }
-        return classes.toTypedArray()
+        return classes.toList()
     }
 
-    private fun findClasses(directory: File, packageName: String): List<Class<*>> {
-        val classes = ArrayList<Class<*>>()
+    private fun findClasses(directory: File, packageName: String): List<KClass<*>> {
+        val classes = mutableListOf<KClass<*>>()
         if (!directory.exists()) {
             return classes
         }
@@ -61,7 +61,7 @@ class AutoDiscovery(typeRegistry: TypeRegistry) {
                 assert(!file.name.contains("."))
                 classes.addAll(findClasses(file, packageName + "." + file.name))
             } else if (file.name.endsWith(".class")) {
-                classes.add(Class.forName(packageName + '.'.toString() + file.name.substring(0, file.name.length - 6)))
+                classes.add(Class.forName(packageName + '.'.toString() + file.name.substring(0, file.name.length - 6)).kotlin)
             }
         }
         return classes
