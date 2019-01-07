@@ -1,15 +1,16 @@
 package com.electrichead.kotlinject.test.unit.registration.packagescanning
 
 import com.electrichead.kotlinject.Container
+import com.electrichead.kotlinject.registration.Binding
+import com.electrichead.kotlinject.registration.Lifecycle
 import com.electrichead.kotlinject.test.unit.stubs.*
 import com.electrichead.kotlinject.registration.TypeRegistry
+import com.electrichead.kotlinject.registration.conditionalbinding.WhenInjectedInto
 import com.electrichead.kotlinject.registration.packagescanning.AutoDiscovery
 import com.electrichead.kotlinject.test.unit.stubs.IFoo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class AutoDiscoveryTests {
 
@@ -58,12 +59,24 @@ class AutoDiscoveryTests {
             )
         }
 
-        val container = Container(_registry)
+        val binding = _registry.retrieveBindingFor(Foo::class).single()
+        val injectionBinding = binding.condition as WhenInjectedInto
 
-        val instanceCreatedFromConditionalBinding = container.resolve<TypeWithDependency>()
-        assertEquals(instanceCreatedFromConditionalBinding.foo::class, Foo::class)
+        assertEquals(binding.condition::class, WhenInjectedInto::class)
+        assertEquals(injectionBinding.target, TypeWithDependency::class)
+    }
 
-        // Cannot create, because bindings including Foo are all conditional.
-        assertThrows<Exception> { container.resolve<Foo>() }
+    @Test
+    fun autoBinding_SupportsLifecycles() {
+        _registry.bindSelf<TypeWithDependency>()
+        _discovery.fromPackageContaining<IFoo> { x ->
+            x.bindClassesAndInterfaces (
+                lifecycle = Lifecycle.Singleton
+            )
+        }
+
+        val binding = _registry.retrieveBindingFor(Foo::class).single()
+
+        assertEquals(binding.lifecycle::class, Lifecycle.Singleton::class)
     }
 }
