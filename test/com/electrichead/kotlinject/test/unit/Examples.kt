@@ -135,8 +135,7 @@ class Examples {
 
         // Scan for everything
         container.registrations.scan
-            .fromPackageContaining<IFoo> { x -> x.bindAllInterfaces()  }
-            .fromPackageContaining<IFoo> { x -> x.bindClassesToSelf()  }
+            .fromPackageContaining<IFoo> { x -> x.bindClassesAndInterfaces() }
 
         // Register factories for special cases
         container.registrations

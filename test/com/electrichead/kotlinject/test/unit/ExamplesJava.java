@@ -118,8 +118,7 @@ public class ExamplesJava {
 
         // Scan for everything
         container.registrations().scan()
-            .fromPackageContaining(IFoo.class, x -> x.bindAllInterfaces())
-            .fromPackageContaining(IFoo.class, x -> x.bindClassesToSelf());
+            .fromPackageContaining(IFoo.class, x -> x.bindClassesAndInterfaces());
 
         // Register factories for special cases
         container.registrations()

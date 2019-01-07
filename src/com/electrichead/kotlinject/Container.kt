@@ -10,11 +10,12 @@ import kotlin.reflect.KClass
 class Container {
 
     @get:JvmName("registrations")
-    val registrations = TypeRegistry()
-
+    val registrations : TypeRegistry
     private val creator : IActivateTypes
 
-    init {
+    constructor () : this(TypeRegistry())
+    constructor (typeRegistry : TypeRegistry) {
+        registrations = typeRegistry
         creator = LifeCycleManagingTypeActivator(TypeActivator(registrations))
     }
 

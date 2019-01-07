@@ -1,11 +1,14 @@
 package com.electrichead.kotlinject.test.unit.registration.packagescanning
 
+import com.electrichead.kotlinject.Container
 import com.electrichead.kotlinject.test.unit.stubs.*
 import com.electrichead.kotlinject.registration.TypeRegistry
 import com.electrichead.kotlinject.registration.packagescanning.AutoDiscovery
 import com.electrichead.kotlinject.test.unit.stubs.IFoo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class AutoDiscoveryTests {
@@ -40,9 +43,27 @@ class AutoDiscoveryTests {
     fun scanFromClassPath_AutobindsClassesFromPackages() {
         _discovery.fromClasspathWhere(
             { classes -> classes.contains(Bar::class) },
-            { c -> c.bindClassesAndInterfaces()})
+            { c -> c.bindClassesAndInterfaces() })
 
         val somethingElse = _registry.retrieveBindingFor(Foo::class).single()
         assertNotNull(somethingElse.targetType)
+    }
+
+    @Test
+    fun autoBinding_SupportsConditions() {
+        _registry.bindSelf<TypeWithDependency>()
+        _discovery.fromPackageContaining<IFoo> { x ->
+            x.bindClassesAndInterfaces (
+                { condition -> condition.whenInjectedInto(TypeWithDependency::class) }
+            )
+        }
+
+        val container = Container(_registry)
+
+        val instanceCreatedFromConditionalBinding = container.resolve<TypeWithDependency>()
+        assertEquals(instanceCreatedFromConditionalBinding.foo::class, Foo::class)
+
+        // Cannot create, because bindings including Foo are all conditional.
+        assertThrows<Exception> { container.resolve<Foo>() }
     }
 }
