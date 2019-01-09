@@ -9,15 +9,8 @@ import kotlin.reflect.KClass
 class BindAllInterfaces(condition: ((op: BindingConditions) -> IBindingCondition)?, lifecycle: Lifecycle?) :
     BindingStrategyBase(condition, lifecycle) {
     override fun bind(typeRegistry: TypeRegistry, classes: List<KClass<*>>) {
-        for(clazz in classes) {
-            if(!clazz.java.isInterface) {
-                val allInterfaces = clazz.java.interfaces
-
-                for(iface in allInterfaces){
-                    typeRegistry.bind(iface.kotlin, clazz, condition, lifeCycle)
-                }
-            }
-        }
+        classes
+            .filter { x -> !x.java.isInterface }
+            .forEach { c -> c.java.interfaces.forEach { i -> typeRegistry.bind(i.kotlin, c, condition, lifeCycle) }}
     }
 }
-
