@@ -30,7 +30,9 @@ This is Kotlinject - named with a hat-tip to Ninject - the most user friendly DI
 
 # Installation
 
-Clone this repository? Profit? (TBC)
+* Download the latest release from GitHub releases
+* Clone this repository and build manually
+* Maven coming soon.
 
 # Getting started
 
